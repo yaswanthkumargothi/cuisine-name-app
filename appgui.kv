@@ -1,0 +1,19 @@
+
+Cameraclick:
+    orientation: "vertical"
+    MDToolbar:
+        id: toolbar
+        pos_hint: {"top": 1}
+        elevation: 10
+        title: "Incuisine"
+        #left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+    Camera:
+        id: camera1
+        #resolution: (680,420)
+        #size: Window.size
+        play: True
+    Button:
+        text: 'Capture'
+        size_hint_y: None
+        height: '48dp'
+        on_release: root.capture()

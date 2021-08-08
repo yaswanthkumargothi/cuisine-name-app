@@ -1,12 +1,11 @@
 import numpy as np
-
 #set input tensor
 def set_input_tensor(interpreter, image):
   tensor_index = interpreter.get_input_details()[0]['index']
   input_tensor = interpreter.tensor(tensor_index)()[0]
   input_tensor[:, :] = image
 
-def classify_image(interpreter, image, top_k=1):
+def classify_image(interpreter,labels, top_k=1):
     
     
     interpreter.invoke()

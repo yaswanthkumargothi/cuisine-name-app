@@ -1,22 +1,20 @@
-import kivy 
-from kivy.app import App
 from kivy.uix.button import Button
 from kivy.lang import Builder
 from kivy.uix.camera import Camera
-from kivy.uix.boxlayout import BoxLayout
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.app import MDApp
-from kivymd.uix.button import MDFillRoundFlatButton
-import time
 import food_predict
 import tensorflow as tf
 import cv2
 
-#TESTTEST
-MODEL_PATH = "cuisine-name-app\models\model.tflite"
+#TESTTESTE:\freelance\kivy_app\cuisine-name-app\models\model.tflite
+MODEL_PATH = "models\model.tflite"
 
-labels=['gulab jamun','dhokla','poori','kathi roll','idly','meduvadai','tandoori chicken',
- 'butternaan','noodles','vada pav','biriyani','ven pongal','chaat','halwa',
- 'upma','bisibelebath','samosa','paniyaram','chappati','dosa']
+labels=['Gulab jamun','Dhokla','Poori','Kathi roll','Idly','Meduvadai','Tandoori chicken',
+ 'Butternaan','Noodles','Vada pav','Biriyani','Ven pongal','Chaat','Halwa',
+ 'Upma','Bisibelebath','Samosa','Paniyaram','Chappati','Dosa']
 
 
 # Load the TFLite model and allocate tensors.
@@ -29,49 +27,41 @@ output_details = interpreter.get_output_details()
 
 
 
-##
-kv = '''
-CameraClick:
-    orientation: 'vertical'
-    Camera:
-        id: camera
-        #resolution: (640, 480)
-        play: True
-    MDFillRoundFlatButton:
-        text: 'Capture'
-        #size_hint_y: None
-        #height: '48dp'
-        pos_hint: {"center_x": .5, "center_y": .4}
-        on_release: root.capture()
-        #background_normal: ""
-        md_bg_color: (173/255,252/255,3/255,0.7)
-'''
+class TestNavigationDrawer(MDApp):
+    def build(self):
+        return Builder.load_file("appgui.kv")
+       
 
-class CameraClick(BoxLayout):
+class Cameraclick(MDBoxLayout):
+    dialog = None
     def capture(self):
-        camera = self.ids.camera
-        time_str = time.strftime("%Y%m%d_%H%M%S")
-        food_image = camera.export_to_png(f'IMG_{time_str}.png')
+        camera=self.ids.camera1
+        camera.export_to_png(f'food.png')
         #read image
-        img_arr = cv2.imread(food_image, cv2.IMREAD_UNCHANGED) #[...,::-1] #convert BGR to RGB format #optional
+        img_arr = cv2.imread("food.png")
         resized_arr = cv2.resize(img_arr, (256, 256))
         
         food_predict.set_input_tensor(interpreter, resized_arr)
-        food_name = food_predict.classify_image(interpreter, food_image, top_k=1)
-
-        
-        
+        food_name = food_predict.classify_image(interpreter,labels, top_k=1)
         print(food_name)
+        if not self.dialog:
+            self.dialog = MDDialog(
+                title=food_name[0][0],
+                type="simple",
+                buttons=[
+            MDFlatButton(text="Close", on_release=self.closeDialog)],
+            )
+        self.dialog.open()
+
+    def closeDialog(self,inst):
+        self.dialog.dismiss()
 
 
-class TestCamera(MDApp):
-    def build(self):
-        return Builder.load_string(kv)
+TestNavigationDrawer().run()
 
 
-    
-if __name__ =="__main__":
-    TestCamera().run()
+        
+
 
 
 
